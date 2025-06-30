@@ -1,0 +1,12 @@
+pandas
+Flask
+Flask-Cors
+joblib
+scikit-learn
+numpy
+scipy
+scikit-optimize
+scikit-image
+scikit-learn
+scikit-learn-intelex
+

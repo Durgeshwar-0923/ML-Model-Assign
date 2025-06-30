@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Prediction Results | Loan Predictor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+  <style>
+    body {
+      background: #f8f9fa;
+    }
+
+    .results-card {
+      border-radius: 1rem;
+    }
+
+    table thead {
+      background: #343a40;
+      color: #fff;
+    }
+
+    .fade-in-table {
+      animation: fadeIn 0.8s ease-in-out both;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .footer-note {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">🏦 Loan Predictor</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container mt-5 mb-5 animate__animated animate__fadeIn">
+    <div class="card shadow-sm results-card">
+      <div class="card-body p-4">
+        <h1 class="card-title text-center mb-4">📊 Prediction Results</h1>
+
+        <p class="text-center text-muted mb-4">
+          Models used: <span class="fw-bold">{{ models | join(', ') }}</span>
+        </p>
+
+        <!-- Table -->
+        <div class="table-responsive fade-in-table mb-4" role="region" aria-label="Prediction Results Table">
+          {{ table | safe }}
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex justify-content-center gap-3">
+          <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg" aria-label="Upload another file">
+            ← Upload Another CSV
+          </a>
+
+          <a href="{{ url_for('download') }}" class="btn btn-success btn-lg" aria-label="Download results as CSV">
+            📥 Download CSV
+          </a>
+        </div>
+
+        <!-- Footer -->
+        <p class="footer-note text-center mt-4">
+          ⏱ Generated on {{ timestamp or "unknown time" }}
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+venv/
+.env
+
+*.exe
+*.cmd
+*.bat
+activate
+*.ps1
+*.fish
+
+# Jupyter
+.ipynb_checkpoints
+
+# VSCode
+.vscode/
+
+# Mac
+.DS_Store
+
+# Streamlit uploads directory
+uploads/
+
+# Model artifacts (if too large, use LFS instead)
+# saved_models/
+# Ignore large Intel DLLs and other unnecessary binary libs
+Library/
+*.dll
+*.so
+*.dylib
+*.pkl
+__pycache__/
+*.pyc
+*.ipynb_checkpoints
+uploads/
+.env
+venv/
+myenve/
+
+
