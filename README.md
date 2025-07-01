@@ -53,25 +53,36 @@ This project contains two web applications:
 ---
 
 ## Production Deployment
+### 1. Find the Best Model
 
-### Serve the Model
+Run the following to select the best model from your MLflow experiments:
 
-After saving/training your model with MLflow, you can serve it using:
+```bash
+python find_best_model.py
+```
+
+### 2. Promote the Best Model
+
+Promote the selected model to production using:
+
+```bash
+python promote.py
+```
+
+### 3. Serve the Model
+
+After promoting, serve the model for inference:
 
 ```bash
 python serve_model.py
 ```
 
-This will start a server for model inference.
+### 4. Test the Deployed Model
 
-### Test the Deployed Model
-
-To test the deployed model, run:
+Test the served model with:
 
 ```bash
 python test.py
 ```
 
-This script will send test requests to your served model and display the results.
-
----
+# ...existing code...
