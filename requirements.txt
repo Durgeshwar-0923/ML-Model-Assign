@@ -11,4 +11,8 @@ scikit-learn
 scikit-learn-intelex
 streamlit
 xgboost
+plotly
+matplotlib
+seaborn
+pydantic
 
