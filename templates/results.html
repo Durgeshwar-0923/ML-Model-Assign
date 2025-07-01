@@ -1,97 +1,149 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <title>Prediction Results | Loan Predictor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Animate.css -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=swap" rel="stylesheet">
   <style>
     body {
-      background: #f8f9fa;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #dbeafe, #f8f9fa);
     }
 
-    .results-card {
+    .navbar {
+      background-color: #0d6efd;
+    }
+
+    .navbar-brand {
+      color: white !important;
+      font-weight: bold;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      padding: 1rem 2rem;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .result-card {
+      background: white;
       border-radius: 1rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+      padding: 1.5rem;
+      border-top: 5px solid #0d6efd;
+      transition: 0.3s ease-in-out;
     }
 
-    table thead {
-      background: #343a40;
-      color: #fff;
+    .result-card:hover {
+      transform: translateY(-5px);
     }
 
-    .fade-in-table {
-      animation: fadeIn 0.8s ease-in-out both;
+    .badge-status {
+      font-size: 0.8rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 1rem;
+      font-weight: 500;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .badge-approved {
+      background-color: #d1f5e1;
+      color: #198754;
+    }
+
+    .badge-denied {
+      background-color: #f8d7da;
+      color: #dc3545;
+    }
+
+    .field-label {
+      font-weight: 600;
+      color: #6c757d;
+    }
+
+    .btn-group-custom {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-lg-custom {
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
     }
 
     .footer-note {
-      font-size: 0.9rem;
+      text-align: center;
+      font-size: 0.85rem;
       color: #6c757d;
-      margin-top: 1rem;
+      margin-top: 2rem;
     }
   </style>
 </head>
 <body>
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+  <nav class="navbar navbar-expand-lg">
     <div class="container">
-      <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">🏦 Loan Predictor</a>
+      <a class="navbar-brand" href="{{ url_for('index') }}">🚀 Loan Predictor</a>
     </div>
   </nav>
 
-  <!-- Main Content -->
-  <main class="container mt-5 mb-5 animate__animated animate__fadeIn">
-    <div class="card shadow-sm results-card">
-      <div class="card-body p-4">
-        <h1 class="card-title text-center mb-4">📊 Prediction Results</h1>
+  <div class="hero">
+    <h1>📊 Prediction Results</h1>
+    <p>Models used: <strong>{{ models | join(', ') }}</strong> | Generated: {{ timestamp }}</p>
+  </div>
 
-        <p class="text-center text-muted mb-4">
-          Models used: <span class="fw-bold">{{ models | join(', ') }}</span>
-        </p>
+  <section class="card-grid">
+    {% for record in records %}
+    <div class="result-card">
+      <h5>ID: {{ record['ID'] }}</h5>
+      <p><span class="field-label">Age:</span> {{ record['Age'] }}</p>
+      <p><span class="field-label">Income:</span> ${{ record['Income'] }}</p>
+      <p><span class="field-label">Education:</span> {{ record['Education'] }}</p>
+      <p><span class="field-label">Family:</span> {{ record['Family'] }}</p>
 
-        <!-- Table -->
-        <div class="table-responsive fade-in-table mb-4" role="region" aria-label="Prediction Results Table">
-          {{ table | safe }}
+      <hr>
+      <p class="mb-1 fw-semibold text-primary">Model Predictions:</p>
+      {% for model in models %}
+        {% set pred = record['Pred_' + model] %}
+        <div class="mb-1">
+          <span class="field-label">{{ model | capitalize }}:</span>
+          <span class="badge-status {{ 'badge-approved' if pred == 1 else 'badge-denied' }}">
+            {{ '✅ Approved' if pred == 1 else '❌ Denied' }}
+          </span>
         </div>
+      {% endfor %}
 
-        <!-- Actions -->
-        <div class="d-flex justify-content-center gap-3">
-          <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg" aria-label="Upload another file">
-            ← Upload Another CSV
-          </a>
-
-          <a href="{{ url_for('download') }}" class="btn btn-success btn-lg" aria-label="Download results as CSV">
-            📥 Download CSV
-          </a>
-        </div>
-
-        <!-- Footer -->
-        <p class="footer-note text-center mt-4">
-          ⏱ Generated on {{ timestamp or "unknown time" }}
-        </p>
-      </div>
+      <hr>
+      <p class="mb-1 fw-semibold text-success">Final Prediction (Majority Vote):</p>
+      <span class="badge-status {{ 'badge-approved' if record['Final_Prediction'] == 1 else 'badge-denied' }}">
+        {{ '✅ Approved' if record['Final_Prediction'] == 1 else '❌ Denied' }}
+      </span>
     </div>
-  </main>
+    {% endfor %}
+  </section>
 
-  <!-- Bootstrap JS -->
+  <div class="btn-group-custom">
+    <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-lg-custom">⬅️ Upload Another</a>
+    <a href="{{ url_for('download') }}" class="btn btn-success btn-lg-custom">📥 Download CSV</a>
+  </div>
+
+  <div class="footer-note">
+    📄 Powered by Flask | Styled with 💙 Bootstrap
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
