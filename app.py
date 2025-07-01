@@ -1,5 +1,4 @@
 import os
-import io
 import joblib
 import pandas as pd
 from flask import Flask, request, render_template, redirect, flash, url_for, make_response
@@ -68,16 +67,21 @@ def index():
                 for name, model in models.items():
                     df[f'Pred_{name}'] = model.predict(X)
 
+                # ✅ Majority voting for final prediction
+                prediction_cols = [f'Pred_{name}' for name in models]
+                df['Final_Prediction'] = df[prediction_cols].mode(axis=1)[0]
+
                 # Save processed results for download
                 csv_path = os.path.join(UPLOAD_FOLDER, 'latest_results.csv')
                 df.to_csv(csv_path, index=False)
 
                 return render_template(
                     'results.html',
-                    table=df.to_html(classes='table table-striped table-bordered', index=False, border=0),
+                    records=df.to_dict(orient='records'),
                     models=list(models.keys()),
                     timestamp=pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
                 )
+
             except Exception as e:
                 flash(f'❌ Error processing file: {e}')
                 return redirect(request.url)
@@ -102,6 +106,5 @@ def download():
     response.headers["Content-Type"] = "text/csv"
     return response
 
-# ─── Run Server ───────────────────────────────
 if __name__ == '__main__':
     app.run(debug=True)
