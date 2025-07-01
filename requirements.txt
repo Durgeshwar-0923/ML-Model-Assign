@@ -9,4 +9,6 @@ scikit-optimize
 scikit-image
 scikit-learn
 scikit-learn-intelex
+streamlit
+xgboost
 
