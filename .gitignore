@@ -1,4 +1,11 @@
 # Python artifacts
+# Python virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# Python bytecode
 __pycache__/
 *.py[cod]
 *$py.class
@@ -43,3 +50,66 @@ venv/
 myenve/
 
 
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Environment variable/config files
+*.env
+.env.*
+secrets.*
+config.*
+*.secret
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Package distribution
+dist/
+build/
+*.egg-info/
+
+# Pip dependency files
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE/project files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Data files
+*.csv
+*.tsv
+*.xls
+*.xlsx
+*.h5
+*.db
+*.sqlite
+*.pkl
+*.joblib
+
+# Model files
+*.pt
+*.pth
+*.h5
+*.ckpt
+*.onnx
+*.pb
+
+# MLflow artifacts
+mlruns/
+artifacts/
+
+# Misc
+*.bak
+*.swp
+*.tmp
+# Python site-packages (in case it's inside the project)
+site-packages/
+.exe
+.cfg
