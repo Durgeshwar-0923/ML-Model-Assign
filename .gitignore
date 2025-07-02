@@ -122,3 +122,10 @@ etc/
 
 Include/
 Lib/
+
+
+# HTML files
+*.html
+
+.gitignore
+*.git
