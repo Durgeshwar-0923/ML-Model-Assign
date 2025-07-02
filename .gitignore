@@ -49,6 +49,9 @@ uploads/
 venv/
 myenve/
 
+Lib/
+Include/
+
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
@@ -104,6 +107,7 @@ pip-delete-this-directory.txt
 # MLflow artifacts
 mlruns/
 artifacts/
+mlartifacts/
 
 # Misc
 *.bak
@@ -112,4 +116,9 @@ artifacts/
 # Python site-packages (in case it's inside the project)
 site-packages/
 .exe
-.cfg
+
+pyvenv.cfg
+etc/
+
+Include/
+Lib/
