@@ -1,6 +1,7 @@
 import os
 import joblib
 import pandas as pd
+import numpy as np
 from flask import Flask, request, render_template, redirect, flash, url_for, make_response
 from werkzeug.utils import secure_filename
 
@@ -14,33 +15,44 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # ─── Load Transformers & Models ───────────────
-pt       = joblib.load('saved_models/pt.pkl')
-rs       = joblib.load('saved_models/rs.pkl')
-ss       = joblib.load('saved_models/ss.pkl')
-selector = joblib.load('saved_models/selector.pkl')
+try:
+    pt = joblib.load('artifacts/pt.pkl')
+    rs = joblib.load('artifacts/rs.pkl')
+    ss = joblib.load('artifacts/ss.pkl')
+    selector = joblib.load('artifacts/selector.pkl')
+except Exception as e:
+    raise RuntimeError(f"❌ Failed to load preprocessing artifacts: {e}")
 
 models = {}
 for fn in os.listdir('saved_models'):
     if fn.endswith('_model.pkl'):
         name = fn.replace('_model.pkl', '')
-        models[name] = joblib.load(os.path.join('saved_models', fn))
+        try:
+            models[name] = joblib.load(os.path.join('saved_models', fn))
+        except Exception as e:
+            print(f"⚠️ Warning: Could not load model '{name}': {e}")
 
 # ─── Helpers ──────────────────────────────────
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def preprocess_and_select(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(['ID', 'ZIP Code', 'Personal Loan'], axis=1, errors='ignore')
+    df = df.drop(columns=['ID', 'ZIP Code', 'Personal Loan'], errors='ignore')
 
-    rb_cols  = ['CCAvg', 'Mortgage']
+    rb_cols = ['CCAvg', 'Mortgage']
     std_cols = ['Income', 'Experience', 'Age']
 
-    df[rb_cols]  = pt.transform(df[rb_cols])
-    df[rb_cols]  = rs.transform(df[rb_cols])
+    for col in rb_cols + std_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column: {col}")
+
+    # Keep DataFrame format to retain column names
+    df[rb_cols] = pt.transform(df[rb_cols])
+    df[rb_cols] = rs.transform(df[rb_cols])
     df[std_cols] = ss.transform(df[std_cols])
 
-    X_sel = selector.transform(df)
-    return pd.DataFrame(X_sel, columns=[f'F{i}' for i in range(X_sel.shape[1])])
+    selected = selector.transform(df)
+    return pd.DataFrame(selected, columns=[f'F{i}' for i in range(selected.shape[1])])
 
 # ─── Routes ───────────────────────────────────
 @app.route('/', methods=['GET', 'POST'])
@@ -62,16 +74,26 @@ def index():
 
             try:
                 df = pd.read_csv(filepath)
+
+                # Preprocess
                 X = preprocess_and_select(df.copy())
 
+                # Predict using all models
                 for name, model in models.items():
                     df[f'Pred_{name}'] = model.predict(X)
 
-                # ✅ Majority voting for final prediction
-                prediction_cols = [f'Pred_{name}' for name in models]
-                df['Final_Prediction'] = df[prediction_cols].mode(axis=1)[0]
+                    if hasattr(model, 'predict_proba'):
+                        try:
+                            proba = model.predict_proba(X)[:, 1]
+                            df[f'Conf_{name}'] = (np.array(proba) * 100).round(2)
+                        except Exception as e:
+                            print(f"⚠️ Confidence score failed for {name}: {e}")
 
-                # Save processed results for download
+                # Majority voting
+                pred_cols = [col for col in df.columns if col.startswith('Pred_')]
+                df['Final_Prediction'] = df[pred_cols].mode(axis=1)[0]
+
+                # Save results for download
                 csv_path = os.path.join(UPLOAD_FOLDER, 'latest_results.csv')
                 df.to_csv(csv_path, index=False)
 
@@ -79,11 +101,12 @@ def index():
                     'results.html',
                     records=df.to_dict(orient='records'),
                     models=list(models.keys()),
+                    total=len(df),
                     timestamp=pd.Timestamp.now().strftime("%Y-%m-%d %H:%M:%S")
                 )
 
             except Exception as e:
-                flash(f'❌ Error processing file: {e}')
+                flash(f'❌ Error during processing: {str(e)}')
                 return redirect(request.url)
         else:
             flash('❌ Invalid file format. Please upload a .csv file.')
@@ -99,12 +122,12 @@ def download():
         return redirect(url_for('index'))
 
     with open(csv_path, 'r', encoding='utf-8') as f:
-        csv_content = f.read()
+        content = f.read()
 
-    response = make_response(csv_content)
-    response.headers["Content-Disposition"] = "attachment; filename=predictions.csv"
+    response = make_response(content)
+    response.headers["Content-Disposition"] = "attachment; filename=loan_predictions.csv"
     response.headers["Content-Type"] = "text/csv"
     return response
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8080)

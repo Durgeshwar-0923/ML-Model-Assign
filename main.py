@@ -19,7 +19,7 @@ st.set_page_config(
 
 # ─── LOADING ARTIFACTS ─────────────────────────────────────────
 @st.cache_resource(show_spinner=False)
-def load_artifacts(models_dir='saved_models'):
+def load_artifacts(models_dir='artifacts'):
     pt = joblib.load(os.path.join(models_dir, 'pt.pkl'))
     rs = joblib.load(os.path.join(models_dir, 'rs.pkl'))
     ss = joblib.load(os.path.join(models_dir, 'ss.pkl'))

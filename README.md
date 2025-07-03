@@ -16,9 +16,24 @@ This project contains two web applications:
 3. **Install dependencies**
    ```bash
    pip install -r requirements.txt
+
+
    ```
 
 ---
+
+## Execute the DefaulterNotebook.ipynb file
+
+### Evidently reports
+evidently reports are saved in the folder DataDrift_reports 
+## Running MLflow Tracking Server
+
+1. Start the MLflow tracking server:
+   ```bash
+   mlflow ui
+   ```
+2. Open your browser and go to [http://localhost:5000](http://localhost:5000) (or the port shown in your terminal).
+
 
 ## Running the Flask App
 
@@ -27,7 +42,7 @@ This project contains two web applications:
    ```bash
    python app.py
    ```
-3. Open your browser and go to [http://localhost:5000](http://localhost:5000)
+3. Open your browser and go to [http://localhost:8080](http://localhost:8080)
 
 ---
 
@@ -41,14 +56,6 @@ This project contains two web applications:
 3. Streamlit will provide a local URL (e.g., [http://localhost:8501](http://localhost:8501)).
 
 ---
-
-## Running MLflow Tracking Server
-
-1. Start the MLflow tracking server:
-   ```bash
-   mlflow ui
-   ```
-2. Open your browser and go to [http://localhost:5000](http://localhost:5000) (or the port shown in your terminal).
 
 ---
 
@@ -75,6 +82,7 @@ After promoting, serve the model for inference:
 
 ```bash
 python serve_model.py
+2. Open your browser and go to [http://localhost:8000](http://localhost:8000) (or the port shown in your terminal).
 ```
 
 ### 4. Test the Deployed Model
@@ -83,6 +91,7 @@ Test the served model with:
 
 ```bash
 python test.py
+
 ```
 
-# ...existing code...
+## ouputs are present in ouputs_screenshots folder
