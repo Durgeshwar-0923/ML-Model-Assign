@@ -86,7 +86,6 @@ pip-delete-this-directory.txt
 *.sublime-project
 
 # Data files
-*.csv
 *.tsv
 *.xls
 *.xlsx
@@ -127,5 +126,5 @@ Lib/
 # HTML files
 *.html
 
-.gitignore
+
 *.git

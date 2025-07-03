@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import mlflow
 
 # Set the tracking URI to the running MLflow server (on port 8080)
-mlflow.set_tracking_uri("http://127.0.0.1:8080")
+mlflow.set_tracking_uri("http://127.0.0.1:5000")
 
 # Load the model using alias
 model_uri = "models:/BankLoanBestModel@champion"
@@ -29,4 +29,4 @@ def predict():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,port=8000)  # Run on port 5000
